@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FormData {
   email: string;
@@ -45,7 +46,7 @@ const RegistrationForm = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
@@ -83,31 +84,62 @@ const RegistrationForm = () => {
       return;
     }
 
-    // Store data (in a real app, this would go to a backend)
-    const registrationData = {
-      ...formData,
-      id: Math.random().toString(36).substr(2, 9),
-      registrationTimestamp: new Date().toISOString(),
-      lastUpdateTimestamp: new Date().toISOString()
-    };
+    try {
+      // Save to Supabase
+      const { error } = await supabase
+        .from('registrations')
+        .insert([
+          {
+            email: formData.email,
+            full_name: formData.fullName,
+            gender: formData.gender,
+            phone_number: formData.phoneNumber,
+            department: formData.department,
+            batch: formData.batch,
+            year_of_study: formData.yearOfStudy,
+          }
+        ]);
 
-    console.log('Registration Data:', registrationData);
-    
-    toast({
-      title: "Registration Successful!",
-      description: "Your registration has been submitted successfully."
-    });
+      if (error) {
+        if (error.code === '23505') {
+          toast({
+            title: "Email Already Registered",
+            description: "This email has already been used for registration.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Registration Failed",
+            description: "An error occurred during registration. Please try again.",
+            variant: "destructive"
+          });
+        }
+        return;
+      }
 
-    // Reset form
-    setFormData({
-      email: "",
-      fullName: "",
-      gender: "",
-      phoneNumber: "",
-      department: "",
-      batch: "",
-      yearOfStudy: ""
-    });
+      toast({
+        title: "Registration Successful!",
+        description: "Your registration has been submitted successfully."
+      });
+
+      // Reset form
+      setFormData({
+        email: "",
+        fullName: "",
+        gender: "",
+        phoneNumber: "",
+        department: "",
+        batch: "",
+        yearOfStudy: ""
+      });
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Registration Failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
