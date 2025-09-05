@@ -53,12 +53,86 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          id: string
+          is_leader: boolean
+          joined_at: string
+          member_email: string
+          member_name: string
+          team_id: string
+        }
+        Insert: {
+          id?: string
+          is_leader?: boolean
+          joined_at?: string
+          member_email: string
+          member_name: string
+          team_id: string
+        }
+        Update: {
+          id?: string
+          is_leader?: boolean
+          joined_at?: string
+          member_email?: string
+          member_name?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          current_members: number
+          id: string
+          leader_email: string
+          leader_name: string
+          max_members: number
+          team_code: string
+          team_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_members?: number
+          id?: string
+          leader_email: string
+          leader_name: string
+          max_members?: number
+          team_code: string
+          team_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_members?: number
+          id?: string
+          leader_email?: string
+          leader_name?: string
+          max_members?: number
+          team_code?: string
+          team_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_team_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
