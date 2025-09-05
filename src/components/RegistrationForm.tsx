@@ -122,16 +122,8 @@ const RegistrationForm = () => {
         description: "Your registration has been submitted successfully."
       });
 
-      // Reset form
-      setFormData({
-        email: "",
-        fullName: "",
-        gender: "",
-        phoneNumber: "",
-        department: "",
-        batch: "",
-        yearOfStudy: ""
-      });
+      // Navigate to Team Formation page
+      navigate('/team-formation');
     } catch (error) {
       console.error('Registration error:', error);
       toast({
